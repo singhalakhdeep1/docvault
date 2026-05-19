@@ -1,0 +1,198 @@
+// This is the DocsVault Prisma schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  fullName     String
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workspaces   WorkspaceMember[]
+  documents    Document[]
+  comments     Comment[]
+  activities   Activity[]
+  sessions     UserSession[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+// ─── Workspaces ────────────────────────────────────────────────────────────
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members   WorkspaceMember[]
+  folders   Folder[]
+  documents Document[]
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(VIEWER)
+  invitedBy   String?
+  joinedAt    DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+enum WorkspaceRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+// ─── Folders ───────────────────────────────────────────────────────────────
+
+model Folder {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  parentFolderId String?
+  name          String
+  emoji         String?
+  position      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parentFolder Folder?   @relation("FolderChildren", fields: [parentFolderId], references: [id])
+  children     Folder[]  @relation("FolderChildren")
+  documents    Document[]
+
+  @@index([workspaceId])
+}
+
+// ─── Documents ─────────────────────────────────────────────────────────────
+
+model Document {
+  id          String         @id @default(cuid())
+  workspaceId String
+  folderId    String?
+  authorId    String
+  title       String
+  emoji       String?
+  status      DocumentStatus @default(ACTIVE)
+  // Stored Yjs binary state (serialized as bytes)
+  yjsState    Bytes?
+  // Plain text snapshot for search indexing
+  textContent String?
+  position    Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder      Folder?      @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  author      User         @relation(fields: [authorId], references: [id])
+  attachments Attachment[]
+  comments    Comment[]
+  activities  Activity[]
+  versions    DocumentVersion[]
+
+  @@index([workspaceId, status])
+  @@index([folderId])
+}
+
+enum DocumentStatus {
+  ACTIVE
+  ARCHIVED
+  TRASHED
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  yjsState   Bytes
+  savedBy    String
+  label      String?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+// ─── Attachments ──────────────────────────────────────────────────────────
+
+model Attachment {
+  id         String   @id @default(cuid())
+  documentId String
+  fileName   String
+  fileSize   Int
+  mimeType   String
+  storageKey String   @unique  // S3/MinIO object key
+  url        String?
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+// ─── Comments ──────────────────────────────────────────────────────────────
+
+model Comment {
+  id         String    @id @default(cuid())
+  documentId String
+  authorId   String
+  content    String
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
+
+  @@index([documentId])
+}
+
+// ─── Activity Feed ─────────────────────────────────────────────────────────
+
+model Activity {
+  id         String   @id @default(cuid())
+  workspaceId String?
+  documentId String?
+  userId     String
+  type       String   // e.g. "doc.created", "doc.renamed", "member.invited"
+  meta       Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  document Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id])
+
+  @@index([workspaceId])
+  @@index([documentId])
+}

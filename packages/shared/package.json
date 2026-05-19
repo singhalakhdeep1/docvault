@@ -1,0 +1,21 @@
+{
+    "name": "@docsvault/shared",
+    "private": true,
+    "version": "0.1.0",
+    "type": "commonjs",
+    "main": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "build": "tsc",
+        "lint": "eslint .",
+        "type-check": "tsc -p tsconfig.json --noEmit"
+    },
+    "dependencies": {
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "typescript": "^5.8.3"
+    }
+}

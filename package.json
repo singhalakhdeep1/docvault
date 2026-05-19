@@ -1,0 +1,26 @@
+{
+    "name": "docsvault",
+    "version": "0.1.0",
+    "private": true,
+    "description": "DocsVault — Notion-style realtime collaboration (Yjs CRDT) + Meilisearch + S3 uploads (signed URLs).",
+    "packageManager": "pnpm@9.15.0",
+    "scripts": {
+        "dev": "turbo dev",
+        "build": "turbo build",
+        "lint": "turbo lint",
+        "type-check": "turbo type-check",
+        "test": "turbo test",
+        "test:e2e": "turbo test:e2e",
+        "infra:up": "docker-compose up -d",
+        "infra:down": "docker-compose down"
+    },
+    "devDependencies": {
+        "turbo": "^2.5.4",
+        "typescript": "^5.8.3",
+        "@types/node": "^22.15.18"
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ]
+}
