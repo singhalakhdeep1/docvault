@@ -1,28 +1,8 @@
-# DocsVault — Notion-Style Realtime Collaboration Platform
+# DocsVault — Realtime Collaboration Platform
 
-> A production-grade **Notion / Confluence clone** built with NestJS, Yjs CRDT, Meilisearch, and MinIO.
-> Realtime multi-user document editing with live cursors, workspace RBAC, folder hierarchy, full-text search, S3-compatible file attachments, and inline comments.
+A Notion-style collaborative knowledge-base platform built with NestJS, Yjs CRDT, Meilisearch, and MinIO. Features realtime multi-user document editing with live cursors, workspace RBAC, folder hierarchy, full-text search, S3-compatible file attachments, and inline comments.
 
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [Architecture](#2-architecture)
-3. [Tech Stack](#3-tech-stack)
-4. [Database Schema](#4-database-schema)
-5. [Realtime Collaboration (Yjs + Socket.IO)](#5-realtime-collaboration-yjs--socketio)
-6. [API Reference](#6-api-reference)
-7. [Frontend Application](#7-frontend-application)
-8. [Environment Variables](#8-environment-variables)
-9. [Quick Start](#9-quick-start)
-10. [Full Docker Deployment](#10-full-docker-deployment)
-11. [Key Design Decisions](#11-key-design-decisions)
-12. [Project Structure](#12-project-structure)
-
----
-
-## 1. Project Overview
+## Project Overview
 
 DocsVault is a collaborative knowledge-base platform where teams can:
 
@@ -36,7 +16,7 @@ DocsVault is a collaborative knowledge-base platform where teams can:
 
 ---
 
-## 2. Architecture
+## Architecture
 
 ```
 docsvault/
@@ -66,7 +46,7 @@ docsvault/
 
 ---
 
-## 3. Tech Stack
+## Tech Stack
 
 | Layer            | Technology                                                               |
 | ---------------- | ------------------------------------------------------------------------ |
@@ -84,7 +64,7 @@ docsvault/
 
 ---
 
-## 4. Database Schema
+## Database Schema
 
 12 Prisma models organized across five domains:
 
@@ -131,7 +111,7 @@ Folders support **unlimited nesting** via `parentFolder`/`children` self-relatio
 
 ---
 
-## 5. Realtime Collaboration (Yjs + Socket.IO)
+## Realtime Collaboration (Yjs + Socket.IO)
 
 ### Connection
 
@@ -187,7 +167,7 @@ The server assigns one of 10 distinct colors from `CURSOR_COLORS` at connection 
 
 ---
 
-## 6. API Reference
+## API Reference
 
 Base URL: `http://localhost:4000`
 Swagger UI: `http://localhost:4000/api/docs`
@@ -286,7 +266,7 @@ Both endpoints accept an optional `?limit=` query param (default 50).
 
 ---
 
-## 7. Frontend Application
+## Frontend Application
 
 Built with **Next.js 15 App Router**, TailwindCSS, TanStack Query v5, Zustand, Tiptap, socket.io-client, date-fns.
 
@@ -326,7 +306,7 @@ Built with **Next.js 15 App Router**, TailwindCSS, TanStack Query v5, Zustand, T
 
 ---
 
-## 8. Environment Variables
+## Environment Variables
 
 Copy `.env.example` to `.env` (root):
 
@@ -366,7 +346,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 
 ---
 
-## 9. Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -420,7 +400,7 @@ The API automatically calls `ensureIndex()` on startup, which creates the `docum
 
 ---
 
-## 10. Full Docker Deployment
+## Full Docker Deployment
 
 ```bash
 # 1. Configure environment
@@ -439,7 +419,7 @@ The `docker-compose.yml` includes: `postgres`, `redis`, `meilisearch`, `minio`, 
 
 ---
 
-## 11. Key Design Decisions
+## Key Design Decisions
 
 ### Yjs CRDT for conflict-free editing
 
@@ -497,7 +477,7 @@ The `JwtAuthGuard` is registered globally via `APP_GUARD`. Routes that need to b
 
 ---
 
-## 12. Project Structure
+## Project Structure
 
 ```
 docsvault/
@@ -568,3 +548,9 @@ docsvault/
 ├── pnpm-workspace.yaml
 └── .env.example
 ```
+
+---
+
+## 📝 License
+
+Proprietary - All rights reserved.
