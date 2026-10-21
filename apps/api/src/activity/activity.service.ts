@@ -1,5 +1,4 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
 import { PrismaClient } from "@docsvault/database";
 import { PRISMA_TOKEN } from "../database/database.module";
 
@@ -9,7 +8,7 @@ export class ActivityService {
 
     async log(data: { workspaceId?: string; documentId?: string; userId: string; type: string; meta?: Record<string, unknown> }) {
         return this.prisma.activity
-            .create({ data: { ...data, meta: (data.meta ?? {}) as Prisma.InputJsonValue } })
+            .create({ data: { ...data, meta: (data.meta ?? {}) as object } })
             .catch(() => null);
     }
 
